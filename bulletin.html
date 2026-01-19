@@ -1,156 +1,32 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Bulletin Board - Entertainment Interactions Team</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <meta charset="utf-8">
+  <title>EIT Bulletin Board</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="window desktop">
-    <div class="titlebar">
-      <div class="title">EIT Bulletin Board System</div>
-      <div class="winbtns">
-        <span class="winbtn" aria-hidden="true"></span>
-        <span class="winbtn" aria-hidden="true"></span>
-        <span class="winbtn close" aria-hidden="true"></span>
-      </div>
-    </div>
+<div class="window desktop">
+  <div class="titlebar"><div class="title">Bulletin Board</div></div>
 
-    <div class="toolbar">
-      <a class="btn" href="index.html">Home</a>
-      <a class="btn" href="admin.html">Admin</a>
-      <button class="btn" id="btnReload" type="button">Refresh</button>
-      <div class="spacer"></div>
-      <div class="status" id="statusClock">BBS</div>
-    </div>
+  <div class="content">
+    <input id="name" placeholder="Name">
+    <input id="topic" placeholder="Topic">
+    <textarea id="msg" placeholder="Message"></textarea>
+    <button onclick="post()">Post</button>
 
-    <div class="content split">
-      <div class="panel left">
-        <div class="panelTitle">Add to Bulletin Board</div>
-        <div class="panelBody stack">
-          <label class="field">
-            <div class="label mono">Name</div>
-            <input class="input mono" id="bbsName" type="text" maxlength="32" placeholder="anonymous" />
-          </label>
-
-          <label class="field">
-            <div class="label mono">Topic</div>
-            <input class="input mono" id="bbsTopic" type="text" maxlength="80" placeholder="title" />
-          </label>
-
-          <label class="field">
-            <div class="label mono">Comment</div>
-            <textarea class="textarea mono" id="bbsBody" rows="10" maxlength="5000" placeholder="write..."></textarea>
-          </label>
-
-          <div class="row">
-            <button class="btn" id="btnPost" type="button">Post</button>
-            <button class="btn" id="btnClear" type="button">Clear</button>
-          </div>
-
-          <div class="hr"></div>
-
-          <div class="panelTitle small">Export/Import</div>
-          <div class="row">
-            <button class="btn tiny" id="btnExport" type="button">Export bulletin.json</button>
-            <label class="btn tiny file">
-              Import bulletin.json
-              <input type="file" id="importFile" accept=".json,application/json" />
-            </label>
-          </div>
-
-          <div class="mono dim" id="bbsStatus">READY</div>
-        </div>
-      </div>
-
-      <div class="panel right">
-        <div class="panelTitle">
-          Public Threads
-          <div class="panelTools">
-            <button class="btn tiny danger" id="btnWipe" type="button">Wipe Local</button>
-          </div>
-        </div>
-        <div class="panelBody">
-          <div id="bbsList" class="list"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="footer mono">
-      <span>PUBLIC BBS</span>
-      <span class="sep">|</span>
-      <span>© Entertainment Interactions Team</span>
-    </div>
+    <div id="bbs"></div>
   </div>
+</div>
 
-  <script src="js/core.js"></script>
-  <script src="js/ui.js"></script>
-  <script src="js/bulletin.js"></script>
-  <script>
-    (function () {
-      ui_initClock();
-
-      const status = document.getElementById("bbsStatus");
-      const nameEl = document.getElementById("bbsName");
-      const topicEl = document.getElementById("bbsTopic");
-      const bodyEl = document.getElementById("bbsBody");
-
-      bulletin_render("bbsList");
-
-      document.getElementById("btnReload").addEventListener("click", () => location.reload());
-
-      document.getElementById("btnPost").addEventListener("click", () => {
-        const name = (nameEl.value || "anonymous").trim();
-        const topic = topicEl.value.trim();
-        const body = bodyEl.value.trim();
-        if (!topic || !body) {
-          alert("Topic and Comment are required.");
-          return;
-        }
-        const post = bulletin_add({ name, topic, body });
-        bulletin_render("bbsList");
-        status.textContent = "POSTED: " + post.id;
-
-        topicEl.value = "";
-        bodyEl.value = "";
-      });
-
-      document.getElementById("btnClear").addEventListener("click", () => {
-        topicEl.value = "";
-        bodyEl.value = "";
-        status.textContent = "FORM CLEARED";
-      });
-
-      document.getElementById("btnExport").addEventListener("click", () => {
-        const json = bulletin_exportJSON();
-        download_text("bulletin.json", json);
-        status.textContent = "EXPORTED: bulletin.json";
-      });
-
-      document.getElementById("importFile").addEventListener("change", async (e) => {
-        const file = e.target.files && e.target.files[0];
-        if (!file) return;
-        try {
-          const text = await file.text();
-          bulletin_importJSON(text);
-          bulletin_render("bbsList");
-          status.textContent = "IMPORTED BULLETIN JSON";
-        } catch (err) {
-          status.textContent = "IMPORT FAILED";
-          alert("Import failed: " + (err && err.message ? err.message : String(err)));
-        } finally {
-          e.target.value = "";
-        }
-      });
-
-      document.getElementById("btnWipe").addEventListener("click", () => {
-        if (!confirm("Delete ALL bulletin posts in this browser?")) return;
-        bulletin_wipeAll();
-        bulletin_render("bbsList");
-        status.textContent = "WIPED LOCAL BBS";
-      });
-    })();
-  </script>
+<script src="core.js"></script>
+<script src="bulletin.js"></script>
+<script>
+bulletin_render("bbs");
+function post(){
+  bulletin_add({name:name.value, topic:topic.value, body:msg.value});
+  bulletin_render("bbs");
+}
+</script>
 </body>
 </html>
