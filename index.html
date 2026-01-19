@@ -1,12 +1,131 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>krr227.github.io</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Entertainment Interactions Team - Terminal</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <h1>GitHub Pages 작동 중</h1>
-  <p>무료 웹페이지 성공</p>
+  <div class="window desktop">
+    <div class="titlebar">
+      <div class="title">Entertainment Interactions Team - News Terminal</div>
+      <div class="winbtns">
+        <span class="winbtn" aria-hidden="true"></span>
+        <span class="winbtn" aria-hidden="true"></span>
+        <span class="winbtn close" aria-hidden="true"></span>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <a class="btn" href="index.html">Home</a>
+      <a class="btn" href="bulletin.html">Bulletin Board</a>
+      <a class="btn" href="admin.html">Admin</a>
+      <button class="btn" id="btnHardRefresh" type="button">Refresh</button>
+      <div class="spacer"></div>
+      <div class="status" id="statusClock">BOOT</div>
+    </div>
+
+    <div class="content split">
+      <div class="panel left">
+        <div class="panelTitle">Company Brief</div>
+        <div class="panelBody mono">
+          <p class="big">ENTERTAINMENT INTERACTIONS TEAM</p>
+          <p class="dim">Internal release channel. Public can read news and join bulletin board discussions.</p>
+
+          <div class="hr"></div>
+
+          <div class="kv">
+            <div class="k">System</div><div class="v">EIT-TERM 0.9</div>
+            <div class="k">Mode</div><div class="v">Static Host (GitHub Pages)</div>
+            <div class="k">Storage</div><div class="v">Browser Local Save + JSON Export</div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="hint">
+            팁:
+            <ul>
+              <li>뉴스는 Admin에서 생성</li>
+              <li>세이브파일은 JSON Export/Import로 “savednews1.json”처럼 사용</li>
+              <li>게시판은 Bulletin Board에서 글 작성</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel right">
+        <div class="panelTitle">
+          Latest News
+          <div class="panelTools">
+            <button class="btn tiny" id="btnNewsExport" type="button">Export News JSON</button>
+            <label class="btn tiny file">
+              Import News JSON
+              <input type="file" id="newsImportFile" accept=".json,application/json" />
+            </label>
+          </div>
+        </div>
+        <div class="panelBody">
+          <div id="newsList" class="list"></div>
+
+          <div class="hr"></div>
+
+          <div class="panelTitle small">Quick Links</div>
+          <div class="row">
+            <a class="btn" href="admin.html">Create News (Admin)</a>
+            <a class="btn" href="bulletin.html">Open Bulletin Board</a>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="dim mono">
+            Note: GitHub Pages는 서버 저장이 불가하므로, 이 사이트는 로컬 저장소 기반으로 동작한다.
+            “공유 저장”이 필요하면 Firebase/Supabase 같은 외부 백엔드가 필요하다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer mono">
+      <span id="footerStatus">READY</span>
+      <span class="sep">|</span>
+      <span>© Entertainment Interactions Team</span>
+    </div>
+  </div>
+
+  <script src="js/core.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/news.js"></script>
+  <script>
+    (function () {
+      ui_initClock();
+      const status = document.getElementById("footerStatus");
+      document.getElementById("btnHardRefresh").addEventListener("click", () => location.reload());
+
+      news_renderList("newsList");
+
+      document.getElementById("btnNewsExport").addEventListener("click", () => {
+        const json = news_exportJSON();
+        download_text("savednews1.json", json);
+        status.textContent = "NEWS EXPORTED: savednews1.json";
+      });
+
+      document.getElementById("newsImportFile").addEventListener("change", async (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        try {
+          const text = await file.text();
+          news_importJSON(text);
+          news_renderList("newsList");
+          status.textContent = "NEWS IMPORTED";
+        } catch (err) {
+          status.textContent = "IMPORT FAILED";
+          alert("뉴스 JSON 가져오기 실패: " + (err && err.message ? err.message : String(err)));
+        } finally {
+          e.target.value = "";
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
-
