@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin - Entertainment Interactions Team</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="window desktop">
+    <div class="titlebar">
+      <div class="title">EIT Admin Console</div>
+      <div class="winbtns">
+        <span class="winbtn" aria-hidden="true"></span>
+        <span class="winbtn" aria-hidden="true"></span>
+        <span class="winbtn close" aria-hidden="true"></span>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <a class="btn" href="index.html">Home</a>
+      <a class="btn" href="bulletin.html">Bulletin Board</a>
+      <button class="btn" id="btnLogout" type="button">Logout</button>
+      <div class="spacer"></div>
+      <div class="status" id="statusClock">ADMIN</div>
+    </div>
+
+    <div class="content">
+      <div class="panel">
+        <div class="panelTitle">Authentication</div>
+        <div class="panelBody">
+          <div id="authBlock" class="stack">
+            <div class="dim mono">Enter the password to unlock “Create News”. (For theme only, not real security)</div>
+            <div class="row">
+              <input class="input mono" id="pw" type="password" placeholder="Password" autocomplete="current-password" />
+              <button class="btn" id="btnLogin" type="button">Login</button>
+            </div>
+            <div class="mono" id="authMsg"></div>
+          </div>
+
+          <div id="adminBlock" class="stack hidden">
+            <div class="panelTitle small">Create News</div>
+
+            <div class="grid2">
+              <label class="field">
+                <div class="label mono">Title</div>
+                <input class="input mono" id="newsTitle" type="text" maxlength="80" />
+              </label>
+
+              <label class="field">
+                <div class="label mono">Category</div>
+                <input class="input mono" id="newsCat" type="text" maxlength="32" placeholder="DEV / RELEASE / NOTICE" />
+              </label>
+
+              <label class="field full">
+                <div class="label mono">Body</div>
+                <textarea class="textarea mono" id="newsBody" rows="10" maxlength="5000"></textarea>
+              </label>
+            </div>
+
+            <div class="row">
+              <button class="btn" id="btnPublish" type="button">Publish</button>
+              <button class="btn" id="btnClear" type="button">Clear</button>
+              <div class="spacer"></div>
+              <button class="btn" id="btnExport" type="button">Export savednews1.json</button>
+              <label class="btn file">
+                Import News JSON
+                <input type="file" id="importFile" accept=".json,application/json" />
+              </label>
+            </div>
+
+            <div class="hr"></div>
+
+            <div class="panelTitle small">Existing News</div>
+            <div id="newsList" class="list"></div>
+
+            <div class="hr"></div>
+
+            <div class="row">
+              <button class="btn danger" id="btnWipeAll" type="button">Wipe All News</button>
+              <div class="mono dim" id="adminStatus">READY</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer mono">
+      <span>ADMIN CONSOLE</span>
+      <span class="sep">|</span>
+      <span>© Entertainment Interactions Team</span>
+    </div>
+  </div>
+
+  <script src="js/core.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/news.js"></script>
+  <script>
+    (function () {
+      ui_initClock();
+
+      const authMsg = document.getElementById("authMsg");
+      const authBlock = document.getElementById("authBlock");
+      const adminBlock = document.getElementById("adminBlock");
+      const adminStatus = document.getElementById("adminStatus");
+
+      function setAuthed(isAuthed) {
+        authBlock.classList.toggle("hidden", isAuthed);
+        adminBlock.classList.toggle("hidden", !isAuthed);
+        if (isAuthed) {
+          news_renderList("newsList", { showAdminTools: true });
+          adminStatus.textContent = "AUTH OK";
+        }
+      }
+
+      setAuthed(auth_isAuthed());
+
+      document.getElementById("btnLogin").addEventListener("click", () => {
+        const pw = document.getElementById("pw").value;
+        const ok = auth_tryLogin(pw);
+        authMsg.textContent = ok ? "ACCESS GRANTED" : "ACCESS DENIED";
+        authMsg.className = ok ? "mono ok" : "mono bad";
+        if (ok) {
+          document.getElementById("pw").value = "";
+          setAuthed(true);
+        }
+      });
+
+      document.getElementById("btnLogout").addEventListener("click", () => {
+        auth_logout();
+        authMsg.textContent = "LOGGED OUT";
+        authMsg.cl
