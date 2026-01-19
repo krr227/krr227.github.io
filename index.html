@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -31,7 +31,7 @@
         <div class="panelTitle">Company Brief</div>
         <div class="panelBody mono">
           <p class="big">ENTERTAINMENT INTERACTIONS TEAM</p>
-          <p class="dim">Internal release channel. Public can read news and join bulletin board discussions.</p>
+          <p class="dim">Internal release channel. The public can read news and join discussions on the bulletin board.</p>
 
           <div class="hr"></div>
 
@@ -44,11 +44,11 @@
           <div class="hr"></div>
 
           <div class="hint">
-            팁:
+            Tips:
             <ul>
-              <li>뉴스는 Admin에서 생성</li>
-              <li>세이브파일은 JSON Export/Import로 “savednews1.json”처럼 사용</li>
-              <li>게시판은 Bulletin Board에서 글 작성</li>
+              <li>Create news in the Admin page</li>
+              <li>Use JSON Export/Import as a “save file” (like savednews1.json)</li>
+              <li>Use the Bulletin Board for public threads</li>
             </ul>
           </div>
         </div>
@@ -79,8 +79,8 @@
           <div class="hr"></div>
 
           <div class="dim mono">
-            Note: GitHub Pages는 서버 저장이 불가하므로, 이 사이트는 로컬 저장소 기반으로 동작한다.
-            “공유 저장”이 필요하면 Firebase/Supabase 같은 외부 백엔드가 필요하다.
+            Note: GitHub Pages cannot write server-side files. This site runs on local browser storage.
+            If you need shared online storage, you will need an external backend (Firebase/Supabase, etc.).
           </div>
         </div>
       </div>
@@ -100,6 +100,7 @@
     (function () {
       ui_initClock();
       const status = document.getElementById("footerStatus");
+
       document.getElementById("btnHardRefresh").addEventListener("click", () => location.reload());
 
       news_renderList("newsList");
@@ -120,7 +121,7 @@
           status.textContent = "NEWS IMPORTED";
         } catch (err) {
           status.textContent = "IMPORT FAILED";
-          alert("뉴스 JSON 가져오기 실패: " + (err && err.message ? err.message : String(err)));
+          alert("News JSON import failed: " + (err && err.message ? err.message : String(err)));
         } finally {
           e.target.value = "";
         }
