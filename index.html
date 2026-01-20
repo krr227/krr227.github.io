@@ -1,1 +1,1932 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Entertainment Interactions Team</title>
+  <meta name="description" content="Entertainment Interactions Team - retro 90s studio site with news and bulletin board (single-file demo)." />
+  <style>
+    :root{
+      --bg:#0b1b2b;
+      --panel:#c9c9c9;
+      --panel2:#bdbdbd;
+      --ink:#111;
+      --ink2:#2a2a2a;
+      --hl:#ffffff;
+      --sh:#6c6c6c;
+      --sh2:#8a8a8a;
+      --accent:#0b5bd3;
+      --accent2:#0e7b45;
+      --warn:#b50f2a;
+      --mono: ui-monospace, "Courier New", Courier, monospace;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+    html,body{height:100%;}
+    body{
+      margin:0;
+      color:var(--ink);
+      font-family:var(--mono);
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255,255,255,0.06), transparent 45%),
+        radial-gradient(circle at 80% 30%, rgba(255,255,255,0.05), transparent 55%),
+        linear-gradient(180deg, #081523, #06101c 60%, #050d16);
+    }
+
+    /* 90s-ish checker texture */
+    .noise{
+      position:fixed; inset:0;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px) 0 0/10px 10px,
+        linear-gradient(0deg, rgba(255,255,255,0.02) 1px, transparent 1px) 0 0/10px 10px;
+      pointer-events:none;
+      mix-blend-mode:overlay;
+      opacity:.55;
+    }
+
+    .wrap{
+      max-width:1050px;
+      margin:22px auto;
+      padding:14px;
+    }
+
+    .window{
+      background:var(--panel);
+      border:2px solid var(--hl);
+      box-shadow:
+        inset -2px -2px 0 var(--sh),
+        inset 2px 2px 0 var(--hl),
+        0 14px 32px rgba(0,0,0,.45);
+    }
+
+    .titlebar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      background:linear-gradient(90deg, #0b3a8f, #1b6ad4);
+      color:#fff;
+      padding:6px 8px;
+      font-family:var(--mono);
+      font-weight:700;
+      letter-spacing:.2px;
+      user-select:none;
+    }
+    .titlebar .btns{
+      display:flex; gap:6px;
+    }
+    .tb-btn{
+      width:14px;height:14px;
+      background:var(--panel2);
+      border:1px solid var(--hl);
+      box-shadow: inset -1px -1px 0 var(--sh), inset 1px 1px 0 var(--hl);
+    }
+
+    .content{
+      padding:12px;
+      background:linear-gradient(180deg, #d2d2d2, #c7c7c7);
+    }
+
+    .row{display:flex; gap:12px; flex-wrap:wrap;}
+    .col{flex:1 1 320px; min-width:320px;}
+
+    .panel{
+      background:#d7d7d7;
+      border:2px solid var(--hl);
+      box-shadow: inset -2px -2px 0 var(--sh), inset 2px 2px 0 var(--hl);
+      padding:10px;
+      margin-bottom:12px;
+    }
+
+    .h1{
+      font-size:18px;
+      margin:0 0 6px 0;
+      font-weight:900;
+    }
+    .sub{
+      font-family:var(--sans);
+      color:#1f2c3a;
+      font-size:13px;
+      line-height:1.3;
+    }
+    .badge{
+      display:inline-block;
+      padding:2px 6px;
+      border:1px solid rgba(0,0,0,.35);
+      background:#efefef;
+      font-size:12px;
+      margin-left:6px;
+      box-shadow: inset -1px -1px 0 rgba(0,0,0,.18), inset 1px 1px 0 rgba(255,255,255,.8);
+    }
+
+    label{display:block; font-size:12px; margin:8px 0 4px;}
+    input[type="text"], input[type="password"], textarea, select{
+      width:100%;
+      box-sizing:border-box;
+      padding:7px 8px;
+      background:#f4f4f4;
+      border:2px solid var(--sh);
+      box-shadow: inset 2px 2px 0 rgba(0,0,0,.12), inset -2px -2px 0 rgba(255,255,255,.55);
+      font-family:var(--mono);
+      font-size:13px;
+    }
+    textarea{min-height:90px; resize:vertical; font-family:var(--mono);}
+
+    .btn{
+      display:inline-block;
+      padding:7px 10px;
+      margin:6px 6px 0 0;
+      background:var(--panel2);
+      border:2px solid var(--hl);
+      box-shadow: inset -2px -2px 0 var(--sh), inset 2px 2px 0 var(--hl);
+      color:#000;
+      font-family:var(--mono);
+      font-weight:700;
+      cursor:pointer;
+      user-select:none;
+    }
+    .btn:active{
+      box-shadow: inset 2px 2px 0 var(--sh), inset -2px -2px 0 var(--hl);
+      transform:translateY(1px);
+    }
+    .btn.primary{
+      background:#dfe9ff;
+      border-color:#fff;
+    }
+    .btn.good{
+      background:#ddf7e9;
+    }
+    .btn.danger{
+      background:#ffe1e6;
+      border-color:#fff;
+    }
+    .btn.link{
+      background:transparent;
+      border:none;
+      box-shadow:none;
+      padding:0;
+      margin:0;
+      color:#0b3a8f;
+      text-decoration:underline;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .hr{
+      height:2px;
+      background:#b0b0b0;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.65);
+      margin:10px 0;
+    }
+
+    .note{
+      font-family:var(--sans);
+      font-size:12px;
+      color:#213446;
+      background:#f3f3f3;
+      padding:8px 10px;
+      border-left:4px solid var(--accent);
+      line-height:1.35;
+    }
+    .warn{ border-left-color: var(--warn); }
+    .ok{ border-left-color: var(--accent2); }
+
+    .tabs{display:flex; gap:6px; flex-wrap:wrap; margin:0 0 10px 0;}
+    .tab{
+      padding:6px 10px;
+      background:#e6e6e6;
+      border:2px solid var(--hl);
+      box-shadow: inset -2px -2px 0 var(--sh), inset 2px 2px 0 var(--hl);
+      cursor:pointer;
+      font-weight:900;
+      user-select:none;
+    }
+    .tab.active{
+      background:#ffffff;
+      outline:2px solid rgba(11,91,211,.25);
+    }
+
+    .list{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .card{
+      background:#efefef;
+      border:2px solid var(--hl);
+      box-shadow: inset -2px -2px 0 var(--sh), inset 2px 2px 0 var(--hl);
+      padding:10px;
+    }
+
+    .card h3{
+      margin:0 0 6px 0;
+      font-size:15px;
+      font-weight:900;
+    }
+    .meta{
+      font-family:var(--sans);
+      font-size:12px;
+      color:#23384a;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin:0 0 8px 0;
+    }
+    .pill{
+      padding:2px 6px;
+      background:#fff;
+      border:1px solid rgba(0,0,0,.25);
+      box-shadow: inset -1px -1px 0 rgba(0,0,0,.10), inset 1px 1px 0 rgba(255,255,255,.7);
+    }
+    .body{
+      font-family:var(--sans);
+      font-size:13px;
+      line-height:1.45;
+      white-space:pre-wrap;
+      color:#10202f;
+    }
+    .img{
+      margin-top:8px;
+      border:2px solid rgba(0,0,0,.25);
+      background:#fff;
+      max-width:100%;
+    }
+
+    .actions{
+      margin-top:8px;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .hidden{display:none !important;}
+    .small{font-size:12px;}
+    .muted{color:#3a4c5c; font-family:var(--sans);}
+
+    .terms{
+      height:170px;
+      overflow:auto;
+      padding:10px;
+      background:#f7f7f7;
+      border:2px solid var(--sh);
+      box-shadow: inset 2px 2px 0 rgba(0,0,0,.12), inset -2px -2px 0 rgba(255,255,255,.55);
+      font-family:var(--sans);
+      font-size:12px;
+      line-height:1.45;
+      color:#142432;
+      white-space:pre-wrap;
+    }
+
+    .footer{
+      margin-top:10px;
+      font-family:var(--sans);
+      font-size:12px;
+      color:#bcd0e3;
+      text-align:center;
+      opacity:.9;
+    }
+
+    .kbd{
+      display:inline-block;
+      padding:2px 6px;
+      border:1px solid rgba(0,0,0,.35);
+      background:#fff;
+      font-family:var(--mono);
+      font-size:12px;
+      box-shadow: inset -1px -1px 0 rgba(0,0,0,.10), inset 1px 1px 0 rgba(255,255,255,.7);
+    }
+  </style>
+</head>
+<body>
+<div class="noise"></div>
+
+<div class="wrap">
+  <div class="window">
+    <div class="titlebar">
+      <div>Entertainment Interactions Team</div>
+      <div class="btns" aria-hidden="true">
+        <div class="tb-btn"></div><div class="tb-btn"></div><div class="tb-btn"></div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="panel">
+        <div class="h1">Studio Terminal <span class="badge" id="roleBadge">Guest</span></div>
+        <div class="sub">
+          A single-file retro site for News + Bulletin Board.
+          <span class="badge">Public GitHub Pages friendly</span>
+        </div>
+        <div class="hr"></div>
+
+        <div class="note warn">
+          Important reality check: a static GitHub Pages site cannot truly share “local save data” across different visitors.
+          This page uses <span class="kbd">localStorage</span>, which is saved per browser/device.
+          To share the same database between people without a server, use the built-in <b>Export/Import Pack</b> feature below.
+          Also, the admin password is visible in page source (client-side), so it is not secure for real admin control.
+        </div>
+
+        <div class="actions">
+          <button class="btn" id="btnLogout" type="button">Log out</button>
+          <button class="btn" id="btnExport" type="button">Export Pack</button>
+          <button class="btn" id="btnImport" type="button">Import Pack</button>
+          <button class="btn danger" id="btnResetAll" type="button" title="Deletes everything stored in your browser">Reset Local Data</button>
+          <span class="muted" id="statusLine"></span>
+        </div>
+      </div>
+
+      <!-- WIZARD -->
+      <section id="wizard" class="panel hidden">
+        <div class="h1">First-time Setup</div>
+        <div class="sub">Everything is in English inside the site. Your profile and posts are stored locally in your browser.</div>
+
+        <div class="hr"></div>
+
+        <div id="wizStep1">
+          <div class="h1 small">Step 1: Pick your display name</div>
+          <label for="wizName">Display Name</label>
+          <input id="wizName" type="text" maxlength="24" placeholder="e.g., JH, Player1, RetroDev" />
+          <div class="actions">
+            <button class="btn primary" id="wizNameNext" type="button">Continue</button>
+          </div>
+        </div>
+
+        <div id="wizStep2" class="hidden">
+          <div class="h1 small">Step 2: Read the Terms</div>
+          <div class="terms" id="termsBox"></div>
+
+          <label><input type="checkbox" id="t1" /> I read the Terms.</label>
+          <label><input type="checkbox" id="t2" /> I understand this is local-only unless I export/import.</label>
+          <label><input type="checkbox" id="t3" /> I agree to be respectful and not upload illegal content.</label>
+
+          <div class="actions">
+            <button class="btn" id="wizBackToName" type="button">Back</button>
+            <button class="btn primary" id="wizTermsNext" type="button">Continue</button>
+          </div>
+        </div>
+
+        <div id="wizStep3" class="hidden">
+          <div class="h1 small">Step 3: Admin check</div>
+          <div class="sub">If you are the studio admin, enter the admin password. Otherwise, click skip.</div>
+
+          <label for="wizAdminPw">Admin Password</label>
+          <input id="wizAdminPw" type="password" placeholder="Admin password" autocomplete="off" />
+          <div class="actions">
+            <button class="btn" id="wizBackToTerms" type="button">Back</button>
+            <button class="btn good" id="wizEnterAdmin" type="button">Enter as Admin</button>
+            <button class="btn" id="wizSkipAdmin" type="button">I am not admin (skip)</button>
+          </div>
+
+          <div class="note" style="margin-top:10px;">
+            If you skip: you will create a user password, then you can post topics and comments.
+          </div>
+        </div>
+
+        <div id="wizStep4" class="hidden">
+          <div class="h1 small">Step 4: Create your user password</div>
+          <div class="sub">This password is stored as a salted hash locally (still not “secure” like a real server, but better than plain text).</div>
+
+          <label for="wizUserPw1">Create Password</label>
+          <input id="wizUserPw1" type="password" placeholder="Create a password" autocomplete="new-password" />
+          <label for="wizUserPw2">Confirm Password</label>
+          <input id="wizUserPw2" type="password" placeholder="Confirm password" autocomplete="new-password" />
+
+          <div class="actions">
+            <button class="btn" id="wizBackToAdmin" type="button">Back</button>
+            <button class="btn primary" id="wizFinishUser" type="button">Finish Setup</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- LOGIN -->
+      <section id="login" class="panel hidden">
+        <div class="h1">Log In</div>
+        <div class="sub">Pick your name, enter your password, and continue.</div>
+        <div class="hr"></div>
+
+        <label for="loginName">Display Name</label>
+        <select id="loginName"></select>
+
+        <label for="loginPw">Password</label>
+        <input id="loginPw" type="password" placeholder="Your password" autocomplete="current-password" />
+
+        <div class="actions">
+          <button class="btn primary" id="btnLogin" type="button">Log in</button>
+          <button class="btn" id="btnGoWizard" type="button">Create new user</button>
+          <button class="btn good" id="btnAdminQuick" type="button">Admin login</button>
+        </div>
+
+        <div class="note warn" style="margin-top:10px;">
+          Admin login here still uses the same client-side admin password check, so it is not real security.
+        </div>
+      </section>
+
+      <!-- APP -->
+      <section id="app" class="hidden">
+        <div class="tabs panel">
+          <div class="tab active" data-tab="home">Home</div>
+          <div class="tab" data-tab="news">News</div>
+          <div class="tab" data-tab="board">Bulletin Board</div>
+          <div class="tab" data-tab="profile">Profile</div>
+        </div>
+
+        <section id="tab_home" class="panel">
+          <div class="h1">Welcome</div>
+          <div class="sub" id="homeSub"></div>
+          <div class="hr"></div>
+
+          <div class="row">
+            <div class="col">
+              <div class="panel">
+                <div class="h1 small">About the Studio</div>
+                <div class="body">
+Entertainment Interactions Team is an indie game development studio focused on retro energy, sharp gameplay, and handcrafted systems.
+
+This site includes:
+- News posts (admin)
+- Bulletin topics + comments (users and admin)
+- One image attachment per news/topic (optional)
+                </div>
+              </div>
+
+              <div class="panel">
+                <div class="h1 small">How “saving” works here</div>
+                <div class="body">
+This is a static single-file site. By default, all data is stored in your browser only.
+To share the same database with other people, use Export Pack and Import Pack.
+                </div>
+              </div>
+            </div>
+
+            <div class="col">
+              <div class="panel">
+                <div class="h1 small">Latest News</div>
+                <div id="homeLatestNews" class="list"></div>
+              </div>
+
+              <div class="panel">
+                <div class="h1 small">Latest Topics</div>
+                <div id="homeLatestTopics" class="list"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="tab_news" class="panel hidden">
+          <div class="h1">News</div>
+          <div class="sub">Official updates from the studio. Users can comment. Admin can post/edit/delete.</div>
+          <div class="hr"></div>
+
+          <div id="newsComposer" class="panel hidden">
+            <div class="h1 small">Post News (Admin)</div>
+            <label for="newsTitle">Title</label>
+            <input id="newsTitle" type="text" maxlength="80" placeholder="Patch notes, devlog, announcement..." />
+            <label for="newsBody">Body</label>
+            <textarea id="newsBody" maxlength="6000" placeholder="Write the news post..."></textarea>
+
+            <label for="newsImage">Optional Image (1 max)</label>
+            <input id="newsImage" type="file" accept="image/*" />
+            <div class="muted small">Images are resized for local storage. Very large images may fail due to storage limits.</div>
+
+            <div class="actions">
+              <button class="btn good" id="btnPublishNews" type="button">Publish</button>
+              <button class="btn" id="btnClearNews" type="button">Clear</button>
+            </div>
+          </div>
+
+          <div id="newsList" class="list"></div>
+        </section>
+
+        <section id="tab_board" class="panel hidden">
+          <div class="h1">Bulletin Board</div>
+          <div class="sub">Create topics, add one image, discuss in comments. Admin can edit/delete any post.</div>
+          <div class="hr"></div>
+
+          <div id="topicComposer" class="panel">
+            <div class="h1 small">Create Topic</div>
+            <label for="topicTitle">Title</label>
+            <input id="topicTitle" type="text" maxlength="80" placeholder="A question, idea, feedback..." />
+            <label for="topicBody">Body</label>
+            <textarea id="topicBody" maxlength="6000" placeholder="Write your topic..."></textarea>
+
+            <label for="topicImage">Optional Image (1 max)</label>
+            <input id="topicImage" type="file" accept="image/*" />
+            <div class="muted small">One image per topic. Comments do not support images.</div>
+
+            <div class="actions">
+              <button class="btn primary" id="btnPostTopic" type="button">Post Topic</button>
+              <button class="btn" id="btnClearTopic" type="button">Clear</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="h1 small">Topics</div>
+            <div id="topicList" class="list"></div>
+          </div>
+        </section>
+
+        <section id="tab_profile" class="panel hidden">
+          <div class="h1">Profile</div>
+          <div class="sub">Manage your local account.</div>
+          <div class="hr"></div>
+
+          <div class="panel">
+            <div class="h1 small">Your info</div>
+            <div class="body" id="profileInfo"></div>
+          </div>
+
+          <div class="panel">
+            <div class="h1 small">Change your password</div>
+            <label for="pwOld">Current Password</label>
+            <input id="pwOld" type="password" autocomplete="current-password" />
+            <label for="pwNew1">New Password</label>
+            <input id="pwNew1" type="password" autocomplete="new-password" />
+            <label for="pwNew2">Confirm New Password</label>
+            <input id="pwNew2" type="password" autocomplete="new-password" />
+            <div class="actions">
+              <button class="btn good" id="btnChangePw" type="button">Change Password</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="h1 small">Account actions</div>
+            <div class="note warn">
+              Deleting your account removes it from your local browser only. If others imported your exported pack, they still have their copy.
+            </div>
+            <div class="actions">
+              <button class="btn danger" id="btnDeleteMe" type="button">Delete My Local Account</button>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-- MODALS -->
+      <section id="modal" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,.55); display:flex; align-items:center; justify-content:center; padding:14px;">
+        <div class="window" style="max-width:760px; width:100%;">
+          <div class="titlebar">
+            <div id="modalTitle">Dialog</div>
+            <div class="btns" aria-hidden="true">
+              <div class="tb-btn"></div><div class="tb-btn"></div><div class="tb-btn"></div>
+            </div>
+          </div>
+          <div class="content">
+            <div id="modalBody"></div>
+            <div class="actions" style="justify-content:flex-end;">
+              <button class="btn" id="modalClose" type="button">Close</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="footer">
+        Entertainment Interactions Team. Single-file demo for GitHub Pages. Local-only storage by default.
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  // ====== CONFIG ======
+  const ADMIN_PASSWORD = "nam130227!!"; // Note: visible client-side, not secure.
+  const STORAGE_KEY = "EIT_DB_v1";
+  const SESSION_KEY = "EIT_SESSION_v1";
+  const MAX_IMAGE_BYTES = 700_000; // after compression attempt (dataURL size will be larger, but helps guard inputs)
+  const MAX_IMAGE_DIM = 720;
+
+  // ====== DOM HELPERS ======
+  const $ = (sel, root=document) => root.querySelector(sel);
+  const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+  const nowISO = () => new Date().toISOString();
+  const fmtTime = (iso) => {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    return d.toLocaleString(undefined, { year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit" });
+  };
+  const uid = () => "id_" + Math.random().toString(16).slice(2) + "_" + Date.now().toString(16);
+
+  const setStatus = (msg) => { $("#statusLine").textContent = msg || ""; };
+
+  // ====== SAFE TEXT ======
+  const cleanName = (s) => (s || "").trim().replace(/\s+/g, " ").slice(0, 24);
+
+  // ====== MODAL ======
+  function showModal(title, html){
+    $("#modalTitle").textContent = title;
+    $("#modalBody").innerHTML = html;
+    $("#modal").classList.remove("hidden");
+  }
+  function closeModal(){ $("#modal").classList.add("hidden"); }
+  $("#modalClose").addEventListener("click", closeModal);
+  $("#modal").addEventListener("click", (e) => {
+    if (e.target === $("#modal")) closeModal();
+  });
+
+  // ====== DB ======
+  function defaultDB(){
+    return {
+      schema: 1,
+      createdAt: nowISO(),
+      studio: {
+        name: "Entertainment Interactions Team"
+      },
+      onboarding: {
+        completed: false
+      },
+      users: [], // {id, name, createdAt, pw:{salt,hash,iter}}
+      news: [],  // {id,title,body,image,createdAt,updatedAt,comments:[]}
+      topics: [] // {id,title,body,image,createdAt,updatedAt,author:{id,name},comments:[]}
+    };
+  }
+
+  function loadDB(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return defaultDB();
+      const db = JSON.parse(raw);
+      if(!db || typeof db !== "object") return defaultDB();
+      // minimal migration safety
+      if(!db.schema) db.schema = 1;
+      db.users ||= [];
+      db.news ||= [];
+      db.topics ||= [];
+      db.onboarding ||= { completed:false };
+      return db;
+    }catch{
+      return defaultDB();
+    }
+  }
+
+  function saveDB(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.db));
+      setStatus("Saved locally.");
+      return true;
+    }catch(err){
+      console.error(err);
+      setStatus("Save failed (storage full?).");
+      showModal("Storage Error", `
+        <div class="note warn">
+          Saving failed. Your browser storage may be full.
+          Try smaller images, delete old posts, or use Reset Local Data (danger).
+        </div>
+      `);
+      return false;
+    }
+  }
+
+  function loadSession(){
+    try{
+      const raw = localStorage.getItem(SESSION_KEY);
+      if(!raw) return null;
+      const s = JSON.parse(raw);
+      if(!s || typeof s !== "object") return null;
+      return s;
+    }catch{
+      return null;
+    }
+  }
+
+  function saveSession(){
+    try{
+      localStorage.setItem(SESSION_KEY, JSON.stringify(state.session));
+    }catch{
+      // ignore
+    }
+  }
+
+  function clearSession(){
+    localStorage.removeItem(SESSION_KEY);
+    state.session = null;
+  }
+
+  // ====== CRYPTO (PBKDF2) ======
+  function bytesToHex(bytes){
+    return Array.from(bytes).map(b => b.toString(16).padStart(2,"0")).join("");
+  }
+  function hexToBytes(hex){
+    const out = new Uint8Array(hex.length/2);
+    for(let i=0;i<out.length;i++){
+      out[i] = parseInt(hex.slice(i*2, i*2+2), 16);
+    }
+    return out;
+  }
+  function randHex(nBytes){
+    const b = new Uint8Array(nBytes);
+    crypto.getRandomValues(b);
+    return bytesToHex(b);
+  }
+  async function pbkdf2Hash(password, saltHex, iterations){
+    const enc = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey(
+      "raw",
+      enc.encode(password),
+      "PBKDF2",
+      false,
+      ["deriveBits"]
+    );
+    const salt = hexToBytes(saltHex);
+    const bits = await crypto.subtle.deriveBits(
+      { name:"PBKDF2", hash:"SHA-256", salt, iterations },
+      keyMaterial,
+      256
+    );
+    return bytesToHex(new Uint8Array(bits));
+  }
+
+  // ====== IMAGE HANDLING (resize/compress to JPEG) ======
+  async function fileToCompressedDataURL(file){
+    if(!file) return null;
+    if(!file.type.startsWith("image/")){
+      throw new Error("Not an image.");
+    }
+    if(file.size > 8_000_000){
+      throw new Error("Image too large (limit 8MB input).");
+    }
+
+    const dataURL = await new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result);
+      r.onerror = () => rej(new Error("Failed to read file."));
+      r.readAsDataURL(file);
+    });
+
+    // Load into <img>
+    const img = await new Promise((res, rej) => {
+      const im = new Image();
+      im.onload = () => res(im);
+      im.onerror = () => rej(new Error("Failed to decode image."));
+      im.src = dataURL;
+    });
+
+    // Resize
+    let w = img.naturalWidth || img.width;
+    let h = img.naturalHeight || img.height;
+    if(!w || !h) throw new Error("Invalid image dimensions.");
+
+    const scale = Math.min(1, MAX_IMAGE_DIM / Math.max(w,h));
+    const tw = Math.max(1, Math.round(w * scale));
+    const th = Math.max(1, Math.round(h * scale));
+
+    const canvas = document.createElement("canvas");
+    canvas.width = tw;
+    canvas.height = th;
+    const ctx = canvas.getContext("2d", { alpha:false });
+    // paint background white to avoid weird transparency artifacts in jpeg
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0,0,tw,th);
+    ctx.drawImage(img, 0,0,tw,th);
+
+    // Iteratively reduce quality if needed
+    let q = 0.82;
+    let out = canvas.toDataURL("image/jpeg", q);
+    // Rough size check using string length
+    while(out.length > MAX_IMAGE_BYTES * 1.37 && q > 0.45){
+      q -= 0.07;
+      out = canvas.toDataURL("image/jpeg", q);
+    }
+
+    if(out.length > MAX_IMAGE_BYTES * 1.7){
+      throw new Error("Image still too large after compression. Use a smaller image.");
+    }
+    return out;
+  }
+
+  // ====== STATE ======
+  const state = {
+    db: loadDB(),
+    session: loadSession(), // {mode:"admin"|"user", userId?, name?}
+    pending: {
+      wizName: "",
+      wizIsAdmin: false,
+      newsImage: null,
+      topicImage: null
+    }
+  };
+
+  // ====== TERMS ======
+  const TERMS_TEXT =
+`TERMS OF USE (LOCAL DEMO)
+
+1) This is a static single-file site intended for GitHub Pages demos.
+2) Your data is saved in your browser's localStorage by default:
+   - That means other visitors will NOT automatically see your data.
+   - To share data between people, use Export Pack and Import Pack.
+3) Do not upload illegal content. Do not harass other users.
+4) Admin tools are client-side. In a public repo, the admin password can be found in the page source.
+   For a real admin system, you need a server or authenticated backend.
+5) Images are stored as compressed data URLs and may fail if storage is full.
+
+By continuing, you agree to use this demo responsibly.`;
+
+  $("#termsBox").textContent = TERMS_TEXT;
+
+  // ====== ROLE / UI ROUTING ======
+  function setRoleBadge(){
+    const b = $("#roleBadge");
+    if(!state.session){
+      b.textContent = "Guest";
+      return;
+    }
+    if(state.session.mode === "admin"){
+      b.textContent = "Admin";
+    }else{
+      b.textContent = "User: " + (state.session.name || "Unknown");
+    }
+  }
+
+  function showOnly(sectionId){
+    for(const id of ["wizard","login","app"]){
+      const el = $("#"+id);
+      if(!el) continue;
+      el.classList.toggle("hidden", id !== sectionId);
+    }
+  }
+
+  function ensureLoginOptions(){
+    const sel = $("#loginName");
+    sel.innerHTML = "";
+    const users = state.db.users.slice().sort((a,b) => a.name.localeCompare(b.name));
+    if(users.length === 0){
+      const opt = document.createElement("option");
+      opt.value = "";
+      opt.textContent = "(No users yet)";
+      sel.appendChild(opt);
+      sel.disabled = true;
+      $("#btnLogin").disabled = true;
+    }else{
+      sel.disabled = false;
+      $("#btnLogin").disabled = false;
+      for(const u of users){
+        const opt = document.createElement("option");
+        opt.value = u.id;
+        opt.textContent = u.name;
+        sel.appendChild(opt);
+      }
+    }
+  }
+
+  function route(){
+    setRoleBadge();
+
+    // if session valid:
+    if(state.session && state.session.mode === "admin"){
+      state.db.onboarding.completed = true;
+      saveDB();
+      showApp();
+      return;
+    }
+    if(state.session && state.session.mode === "user"){
+      // verify user still exists
+      const u = state.db.users.find(x => x.id === state.session.userId);
+      if(u){
+        state.db.onboarding.completed = true;
+        saveDB();
+        showApp();
+        return;
+      }else{
+        clearSession();
+      }
+    }
+
+    // no valid session
+    if(!state.db.onboarding.completed){
+      showWizardStep(1);
+      showOnly("wizard");
+    }else{
+      ensureLoginOptions();
+      showOnly("login");
+    }
+  }
+
+  // ====== TABS ======
+  function setActiveTab(name){
+    $$(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === name));
+    ["home","news","board","profile"].forEach(n => {
+      $("#tab_"+n).classList.toggle("hidden", n !== name);
+    });
+    if(name === "home") renderHome();
+    if(name === "news") renderNews();
+    if(name === "board") renderTopics();
+    if(name === "profile") renderProfile();
+  }
+  $$(".tab").forEach(t => t.addEventListener("click", () => setActiveTab(t.dataset.tab)));
+
+  // ====== WIZARD ======
+  function showWizardStep(n){
+    $("#wizStep1").classList.toggle("hidden", n !== 1);
+    $("#wizStep2").classList.toggle("hidden", n !== 2);
+    $("#wizStep3").classList.toggle("hidden", n !== 3);
+    $("#wizStep4").classList.toggle("hidden", n !== 4);
+  }
+
+  $("#wizNameNext").addEventListener("click", () => {
+    const name = cleanName($("#wizName").value);
+    if(!name){
+      setStatus("Pick a display name.");
+      return;
+    }
+    state.pending.wizName = name;
+    showWizardStep(2);
+    setStatus("");
+  });
+
+  $("#wizBackToName").addEventListener("click", () => showWizardStep(1));
+
+  $("#wizTermsNext").addEventListener("click", () => {
+    if(!$("#t1").checked || !$("#t2").checked || !$("#t3").checked){
+      setStatus("Please check all agreement boxes to continue.");
+      return;
+    }
+    showWizardStep(3);
+    setStatus("");
+  });
+  $("#wizBackToTerms").addEventListener("click", () => showWizardStep(2));
+
+  $("#wizEnterAdmin").addEventListener("click", () => {
+    const pw = $("#wizAdminPw").value;
+    if(pw !== ADMIN_PASSWORD){
+      setStatus("Wrong admin password.");
+      return;
+    }
+    // admin session
+    state.session = { mode:"admin", since: nowISO() };
+    saveSession();
+    state.db.onboarding.completed = true;
+    saveDB();
+    route();
+  });
+
+  $("#wizSkipAdmin").addEventListener("click", () => {
+    showWizardStep(4);
+    setStatus("");
+  });
+
+  $("#wizBackToAdmin").addEventListener("click", () => showWizardStep(3));
+
+  $("#wizFinishUser").addEventListener("click", async () => {
+    const name = state.pending.wizName;
+    const pw1 = $("#wizUserPw1").value;
+    const pw2 = $("#wizUserPw2").value;
+
+    if(!name){
+      setStatus("Missing name. Go back and set your display name.");
+      return;
+    }
+    if(pw1.length < 4){
+      setStatus("Password too short (min 4).");
+      return;
+    }
+    if(pw1 !== pw2){
+      setStatus("Passwords do not match.");
+      return;
+    }
+
+    // If a user with same name exists, block (to prevent confusion)
+    if(state.db.users.some(u => u.name.toLowerCase() === name.toLowerCase())){
+      setStatus("That display name already exists. Please pick another.");
+      showWizardStep(1);
+      $("#wizName").focus();
+      return;
+    }
+
+    try{
+      const salt = randHex(16);
+      const iter = 120000;
+      const hash = await pbkdf2Hash(pw1, salt, iter);
+      const user = { id: uid(), name, createdAt: nowISO(), pw:{ salt, iter, hash } };
+      state.db.users.push(user);
+      state.db.onboarding.completed = true;
+      saveDB();
+      state.session = { mode:"user", userId: user.id, name: user.name, since: nowISO() };
+      saveSession();
+      route();
+    }catch(err){
+      console.error(err);
+      setStatus("Failed to create account (crypto unavailable?).");
+      showModal("Error", `<div class="note warn">Account creation failed. Your browser might block WebCrypto on non-HTTPS pages. GitHub Pages works (HTTPS).</div>`);
+    }
+  });
+
+  // ====== LOGIN ======
+  $("#btnGoWizard").addEventListener("click", () => {
+    // allow creating additional user
+    state.db.onboarding.completed = false;
+    saveDB();
+    $("#wizName").value = "";
+    $("#wizAdminPw").value = "";
+    $("#wizUserPw1").value = "";
+    $("#wizUserPw2").value = "";
+    $("#t1").checked = $("#t2").checked = $("#t3").checked = false;
+    showWizardStep(1);
+    showOnly("wizard");
+    setStatus("");
+  });
+
+  $("#btnAdminQuick").addEventListener("click", () => {
+    showModal("Admin Login", `
+      <div class="panel">
+        <div class="h1 small">Enter admin password</div>
+        <label for="adminQuickPw">Admin Password</label>
+        <input id="adminQuickPw" type="password" placeholder="Admin password" autocomplete="off" />
+        <div class="actions">
+          <button class="btn good" id="adminQuickGo" type="button">Enter</button>
+        </div>
+        <div class="note warn">This is client-side only. Do not treat it as real security.</div>
+      </div>
+    `);
+    setTimeout(() => {
+      const inp = $("#adminQuickPw");
+      if(inp) inp.focus();
+      const go = $("#adminQuickGo");
+      if(go){
+        go.addEventListener("click", () => {
+          const pw = $("#adminQuickPw").value;
+          if(pw !== ADMIN_PASSWORD){
+            setStatus("Wrong admin password.");
+            return;
+          }
+          closeModal();
+          state.session = { mode:"admin", since: nowISO() };
+          saveSession();
+          state.db.onboarding.completed = true;
+          saveDB();
+          route();
+        });
+      }
+    }, 0);
+  });
+
+  $("#btnLogin").addEventListener("click", async () => {
+    const userId = $("#loginName").value;
+    const pw = $("#loginPw").value;
+    const user = state.db.users.find(u => u.id === userId);
+    if(!user){
+      setStatus("No such user.");
+      return;
+    }
+    try{
+      const hash = await pbkdf2Hash(pw, user.pw.salt, user.pw.iter);
+      if(hash !== user.pw.hash){
+        setStatus("Wrong password.");
+        return;
+      }
+      state.session = { mode:"user", userId: user.id, name: user.name, since: nowISO() };
+      saveSession();
+      $("#loginPw").value = "";
+      setStatus("");
+      route();
+    }catch(err){
+      console.error(err);
+      setStatus("Login failed (crypto unavailable?).");
+    }
+  });
+
+  // ====== APP SHOW ======
+  function showApp(){
+    showOnly("app");
+    $("#btnLogout").disabled = !state.session;
+    $("#newsComposer").classList.toggle("hidden", !(state.session && state.session.mode === "admin"));
+    setActiveTab("home");
+    renderAll();
+  }
+
+  function currentUser(){
+    if(!state.session || state.session.mode !== "user") return null;
+    return state.db.users.find(u => u.id === state.session.userId) || null;
+  }
+  function isAdmin(){
+    return state.session && state.session.mode === "admin";
+  }
+
+  function renderAll(){
+    renderHome();
+    renderNews();
+    renderTopics();
+    renderProfile();
+    setRoleBadge();
+  }
+
+  // ====== EXPORT/IMPORT PACK ======
+  function exportPack(){
+    // Simple base64 of JSON; no third-party libs (keeps single-file).
+    const json = JSON.stringify(state.db);
+    const b64 = btoa(unescape(encodeURIComponent(json)));
+    showModal("Export Pack", `
+      <div class="note ok">
+        Copy this pack and share it. Anyone can Import Pack to load the same database locally in their browser.
+      </div>
+      <label>Pack (base64)</label>
+      <textarea id="exportBox" style="min-height:180px;" readonly></textarea>
+      <div class="actions">
+        <button class="btn primary" id="copyPack" type="button">Copy</button>
+      </div>
+    `);
+    setTimeout(() => {
+      const box = $("#exportBox");
+      if(box){
+        box.value = b64;
+        box.focus();
+        box.select();
+      }
+      const cp = $("#copyPack");
+      if(cp){
+        cp.addEventListener("click", async () => {
+          try{
+            await navigator.clipboard.writeText(b64);
+            setStatus("Pack copied to clipboard.");
+          }catch{
+            setStatus("Copy failed. Select and copy manually.");
+          }
+        });
+      }
+    }, 0);
+  }
+
+  function importPack(){
+    showModal("Import Pack", `
+      <div class="note warn">
+        Importing will replace your current local database.
+      </div>
+      <label>Paste Pack (base64)</label>
+      <textarea id="importBox" style="min-height:180px;"></textarea>
+      <div class="actions">
+        <button class="btn danger" id="doImport" type="button">Import (Replace)</button>
+      </div>
+    `);
+    setTimeout(() => {
+      const imp = $("#doImport");
+      if(imp){
+        imp.addEventListener("click", () => {
+          const b64 = ($("#importBox").value || "").trim();
+          if(!b64){
+            setStatus("Paste a pack first.");
+            return;
+          }
+          try{
+            const json = decodeURIComponent(escape(atob(b64)));
+            const db = JSON.parse(json);
+            if(!db || typeof db !== "object") throw new Error("Bad pack");
+            // minimal validation
+            if(!Array.isArray(db.users) || !Array.isArray(db.news) || !Array.isArray(db.topics)){
+              throw new Error("Invalid schema");
+            }
+            state.db = db;
+            saveDB();
+            // session might not match imported users
+            clearSession();
+            closeModal();
+            setStatus("Pack imported. Please log in again.");
+            state.db.onboarding.completed = true;
+            saveDB();
+            ensureLoginOptions();
+            showOnly("login");
+            setRoleBadge();
+          }catch(err){
+            console.error(err);
+            setStatus("Import failed (invalid pack).");
+          }
+        });
+      }
+    }, 0);
+  }
+
+  $("#btnExport").addEventListener("click", exportPack);
+  $("#btnImport").addEventListener("click", importPack);
+
+  // ====== RESET / LOGOUT ======
+  $("#btnLogout").addEventListener("click", () => {
+    clearSession();
+    setStatus("Logged out.");
+    ensureLoginOptions();
+    showOnly("login");
+    setRoleBadge();
+  });
+
+  $("#btnResetAll").addEventListener("click", () => {
+    showModal("Reset Local Data", `
+      <div class="note warn">
+        This deletes all locally stored users, news, and topics from this browser.
+      </div>
+      <div class="actions">
+        <button class="btn danger" id="confirmReset" type="button">Yes, delete everything</button>
+      </div>
+    `);
+    setTimeout(() => {
+      const c = $("#confirmReset");
+      if(c){
+        c.addEventListener("click", () => {
+          localStorage.removeItem(STORAGE_KEY);
+          localStorage.removeItem(SESSION_KEY);
+          state.db = defaultDB();
+          state.session = null;
+          closeModal();
+          setStatus("Local data reset.");
+          route();
+        });
+      }
+    }, 0);
+  });
+
+  // ====== NEWS ======
+  $("#btnClearNews").addEventListener("click", () => {
+    $("#newsTitle").value = "";
+    $("#newsBody").value = "";
+    $("#newsImage").value = "";
+    state.pending.newsImage = null;
+    setStatus("");
+  });
+
+  $("#newsImage").addEventListener("change", async () => {
+    const file = $("#newsImage").files && $("#newsImage").files[0];
+    if(!file){ state.pending.newsImage = null; return; }
+    try{
+      state.pending.newsImage = await fileToCompressedDataURL(file);
+      setStatus("News image ready (compressed).");
+    }catch(err){
+      console.error(err);
+      state.pending.newsImage = null;
+      $("#newsImage").value = "";
+      setStatus(err.message || "Failed to load image.");
+    }
+  });
+
+  $("#btnPublishNews").addEventListener("click", () => {
+    if(!isAdmin()){
+      setStatus("Admin only.");
+      return;
+    }
+    const title = ($("#newsTitle").value || "").trim().slice(0,80);
+    const body = ($("#newsBody").value || "").trim();
+    if(!title || !body){
+      setStatus("Title and body are required.");
+      return;
+    }
+    const post = {
+      id: uid(),
+      title,
+      body,
+      image: state.pending.newsImage || null,
+      createdAt: nowISO(),
+      updatedAt: nowISO(),
+      comments: [] // {id,author:{id?,name,role}, body, createdAt}
+    };
+    state.db.news.unshift(post);
+    saveDB();
+    $("#btnClearNews").click();
+    renderNews();
+    renderHome();
+    setStatus("News published.");
+  });
+
+  function canEditAuthor(authorId){
+    if(isAdmin()) return true;
+    const u = currentUser();
+    if(!u) return false;
+    return authorId === u.id;
+  }
+
+  function addCommentToNews(newsId, text){
+    const body = (text || "").trim();
+    if(!body){
+      setStatus("Comment cannot be empty.");
+      return;
+    }
+    const n = state.db.news.find(x => x.id === newsId);
+    if(!n) return;
+
+    const c = makeComment(body);
+    n.comments.push(c);
+    n.updatedAt = nowISO();
+    saveDB();
+    renderNews();
+    renderHome();
+    setStatus("Comment added.");
+  }
+
+  function makeComment(body){
+    if(isAdmin()){
+      return { id: uid(), author:{ role:"admin", name:"Admin" }, body, createdAt: nowISO() };
+    }
+    const u = currentUser();
+    return { id: uid(), author:{ role:"user", id:u.id, name:u.name }, body, createdAt: nowISO() };
+  }
+
+  function renderComments(comments, ctx){
+    if(!comments || comments.length === 0){
+      return `<div class="muted small">No comments yet.</div>`;
+    }
+    return comments.map(c => {
+      const isCAdmin = c.author && c.author.role === "admin";
+      const authorName = isCAdmin ? "Admin" : (c.author?.name || "User");
+      const can = isAdmin() || (!isCAdmin && currentUser() && c.author?.id === currentUser().id);
+      return `
+        <div class="card" style="background:#f7f7f7;">
+          <div class="meta">
+            <span class="pill">${escapeHTML(authorName)}${isCAdmin ? " (Admin)" : ""}</span>
+            <span class="pill">${fmtTime(c.createdAt)}</span>
+          </div>
+          <div class="body">${escapeHTML(c.body)}</div>
+          <div class="actions">
+            ${can ? `<button class="btn danger" data-act="delComment" data-ctx="${ctx}" data-id="${c.id}">Delete</button>` : ""}
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function escapeHTML(s){
+    return (s ?? "").toString()
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  function renderNews(){
+    const list = $("#newsList");
+    const items = state.db.news;
+
+    if(items.length === 0){
+      list.innerHTML = `<div class="note">No news posts yet.</div>`;
+      return;
+    }
+
+    list.innerHTML = items.map(n => {
+      const hasImg = !!n.image;
+      const commentBoxId = "news_comment_" + n.id;
+      return `
+        <div class="card" data-news="${n.id}">
+          <h3>${escapeHTML(n.title)}</h3>
+          <div class="meta">
+            <span class="pill">Admin</span>
+            <span class="pill">Created: ${fmtTime(n.createdAt)}</span>
+            <span class="pill">Updated: ${fmtTime(n.updatedAt)}</span>
+            <span class="pill">Comments: ${n.comments.length}</span>
+          </div>
+          <div class="body">${escapeHTML(n.body)}</div>
+          ${hasImg ? `<img class="img" alt="Attached image" src="${n.image}"/>` : ``}
+
+          <div class="actions">
+            ${isAdmin() ? `
+              <button class="btn primary" data-act="editNews" data-id="${n.id}">Edit</button>
+              <button class="btn danger" data-act="delNews" data-id="${n.id}">Delete</button>
+            ` : ``}
+          </div>
+
+          <div class="hr"></div>
+          <div class="h1 small">Comments</div>
+          <div class="list">${renderComments(n.comments, "news:"+n.id)}</div>
+
+          <label for="${commentBoxId}">Add comment</label>
+          <textarea id="${commentBoxId}" maxlength="1200" placeholder="Write a comment..."></textarea>
+          <div class="actions">
+            <button class="btn" data-act="addNewsComment" data-id="${n.id}" data-box="${commentBoxId}">Post Comment</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  // News list delegated actions
+  $("#newsList").addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-act]");
+    if(!btn) return;
+    const act = btn.dataset.act;
+
+    if(act === "delNews"){
+      if(!isAdmin()) return;
+      const id = btn.dataset.id;
+      showModal("Delete News", `
+        <div class="note warn">Delete this news post permanently (locally)?</div>
+        <div class="actions">
+          <button class="btn danger" id="confirmDelNews" type="button">Delete</button>
+        </div>
+      `);
+      setTimeout(() => {
+        $("#confirmDelNews")?.addEventListener("click", () => {
+          state.db.news = state.db.news.filter(n => n.id !== id);
+          saveDB();
+          closeModal();
+          renderNews();
+          renderHome();
+          setStatus("News deleted.");
+        });
+      }, 0);
+    }
+
+    if(act === "editNews"){
+      if(!isAdmin()) return;
+      const id = btn.dataset.id;
+      const n = state.db.news.find(x => x.id === id);
+      if(!n) return;
+      showModal("Edit News", `
+        <div class="panel">
+          <div class="h1 small">Edit News Post</div>
+          <label>Title</label>
+          <input id="editNewsTitle" type="text" maxlength="80" value="${escapeHTML(n.title)}" />
+          <label>Body</label>
+          <textarea id="editNewsBody" maxlength="6000">${escapeHTML(n.body)}</textarea>
+          <label>Replace Image (optional)</label>
+          <input id="editNewsImg" type="file" accept="image/*" />
+          <label><input type="checkbox" id="editNewsRemoveImg" /> Remove existing image</label>
+          <div class="actions">
+            <button class="btn good" id="saveNewsEdit" type="button">Save</button>
+          </div>
+        </div>
+      `);
+      setTimeout(() => {
+        let pendingImg = null;
+        $("#editNewsImg")?.addEventListener("change", async () => {
+          const f = $("#editNewsImg").files && $("#editNewsImg").files[0];
+          if(!f){ pendingImg = null; return; }
+          try{
+            pendingImg = await fileToCompressedDataURL(f);
+            setStatus("New image ready.");
+          }catch(err){
+            console.error(err);
+            pendingImg = null;
+            $("#editNewsImg").value = "";
+            setStatus(err.message || "Image failed.");
+          }
+        });
+
+        $("#saveNewsEdit")?.addEventListener("click", () => {
+          const t = ($("#editNewsTitle").value || "").trim().slice(0,80);
+          const b = ($("#editNewsBody").value || "").trim();
+          if(!t || !b){
+            setStatus("Title and body are required.");
+            return;
+          }
+          n.title = t;
+          n.body = b;
+          if($("#editNewsRemoveImg").checked) n.image = null;
+          if(pendingImg) n.image = pendingImg;
+          n.updatedAt = nowISO();
+          saveDB();
+          closeModal();
+          renderNews();
+          renderHome();
+          setStatus("News updated.");
+        });
+      }, 0);
+    }
+
+    if(act === "addNewsComment"){
+      const id = btn.dataset.id;
+      const boxId = btn.dataset.box;
+      const txt = $("#"+boxId)?.value || "";
+      $("#"+boxId).value = "";
+      addCommentToNews(id, txt);
+    }
+
+    if(act === "delComment"){
+      const ctx = btn.dataset.ctx; // "news:<id>" or "topic:<id>"
+      const commentId = btn.dataset.id;
+      const [kind, parentId] = ctx.split(":");
+      if(kind === "news"){
+        const n = state.db.news.find(x => x.id === parentId);
+        if(!n) return;
+        n.comments = n.comments.filter(c => c.id !== commentId);
+        n.updatedAt = nowISO();
+        saveDB();
+        renderNews();
+        renderHome();
+        setStatus("Comment deleted.");
+      }
+      if(kind === "topic"){
+        const t = state.db.topics.find(x => x.id === parentId);
+        if(!t) return;
+        t.comments = t.comments.filter(c => c.id !== commentId);
+        t.updatedAt = nowISO();
+        saveDB();
+        renderTopics();
+        renderHome();
+        setStatus("Comment deleted.");
+      }
+    }
+  });
+
+  // ====== TOPICS ======
+  $("#btnClearTopic").addEventListener("click", () => {
+    $("#topicTitle").value = "";
+    $("#topicBody").value = "";
+    $("#topicImage").value = "";
+    state.pending.topicImage = null;
+    setStatus("");
+  });
+
+  $("#topicImage").addEventListener("change", async () => {
+    const file = $("#topicImage").files && $("#topicImage").files[0];
+    if(!file){ state.pending.topicImage = null; return; }
+    try{
+      state.pending.topicImage = await fileToCompressedDataURL(file);
+      setStatus("Topic image ready (compressed).");
+    }catch(err){
+      console.error(err);
+      state.pending.topicImage = null;
+      $("#topicImage").value = "";
+      setStatus(err.message || "Failed to load image.");
+    }
+  });
+
+  $("#btnPostTopic").addEventListener("click", () => {
+    if(!state.session){
+      setStatus("Please log in first.");
+      return;
+    }
+    if(isAdmin()){
+      // admin can post too, but topic author will show Admin
+    }
+    const title = ($("#topicTitle").value || "").trim().slice(0,80);
+    const body = ($("#topicBody").value || "").trim();
+    if(!title || !body){
+      setStatus("Title and body are required.");
+      return;
+    }
+    const author = isAdmin()
+      ? { role:"admin", name:"Admin" }
+      : { role:"user", id: currentUser().id, name: currentUser().name };
+
+    const topic = {
+      id: uid(),
+      title,
+      body,
+      image: state.pending.topicImage || null,
+      createdAt: nowISO(),
+      updatedAt: nowISO(),
+      author,
+      comments: []
+    };
+    state.db.topics.unshift(topic);
+    saveDB();
+    $("#btnClearTopic").click();
+    renderTopics();
+    renderHome();
+    setStatus("Topic posted.");
+  });
+
+  function addCommentToTopic(topicId, text){
+    const body = (text || "").trim();
+    if(!body){
+      setStatus("Comment cannot be empty.");
+      return;
+    }
+    const t = state.db.topics.find(x => x.id === topicId);
+    if(!t) return;
+
+    const c = makeComment(body);
+    t.comments.push(c);
+    t.updatedAt = nowISO();
+    saveDB();
+    renderTopics();
+    renderHome();
+    setStatus("Comment added.");
+  }
+
+  function renderTopics(){
+    const list = $("#topicList");
+    const items = state.db.topics;
+
+    if(items.length === 0){
+      list.innerHTML = `<div class="note">No topics yet. Post the first one.</div>`;
+      return;
+    }
+
+    list.innerHTML = items.map(t => {
+      const authorName = t.author?.role === "admin" ? "Admin" : (t.author?.name || "User");
+      const canEdit = isAdmin() || (t.author?.role === "user" && currentUser() && t.author?.id === currentUser().id);
+
+      const commentBoxId = "topic_comment_" + t.id;
+      return `
+        <div class="card" data-topic="${t.id}">
+          <h3>${escapeHTML(t.title)}</h3>
+          <div class="meta">
+            <span class="pill">${escapeHTML(authorName)}${t.author?.role === "admin" ? " (Admin)" : ""}</span>
+            <span class="pill">Created: ${fmtTime(t.createdAt)}</span>
+            <span class="pill">Updated: ${fmtTime(t.updatedAt)}</span>
+            <span class="pill">Comments: ${t.comments.length}</span>
+          </div>
+          <div class="body">${escapeHTML(t.body)}</div>
+          ${t.image ? `<img class="img" alt="Attached image" src="${t.image}"/>` : ``}
+
+          <div class="actions">
+            ${canEdit ? `<button class="btn primary" data-act="editTopic" data-id="${t.id}">Edit</button>` : ``}
+            ${canEdit ? `<button class="btn danger" data-act="delTopic" data-id="${t.id}">Delete</button>` : ``}
+          </div>
+
+          <div class="hr"></div>
+          <div class="h1 small">Comments</div>
+          <div class="list">${renderComments(t.comments, "topic:"+t.id)}</div>
+
+          <label for="${commentBoxId}">Add comment</label>
+          <textarea id="${commentBoxId}" maxlength="1200" placeholder="Write a comment..."></textarea>
+          <div class="actions">
+            <button class="btn" data-act="addTopicComment" data-id="${t.id}" data-box="${commentBoxId}">Post Comment</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  $("#topicList").addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-act]");
+    if(!btn) return;
+    const act = btn.dataset.act;
+
+    if(act === "delTopic"){
+      const id = btn.dataset.id;
+      const t = state.db.topics.find(x => x.id === id);
+      if(!t) return;
+      const can = isAdmin() || (t.author?.role === "user" && currentUser() && t.author?.id === currentUser().id);
+      if(!can) return;
+
+      showModal("Delete Topic", `
+        <div class="note warn">Delete this topic permanently (locally)?</div>
+        <div class="actions">
+          <button class="btn danger" id="confirmDelTopic" type="button">Delete</button>
+        </div>
+      `);
+      setTimeout(() => {
+        $("#confirmDelTopic")?.addEventListener("click", () => {
+          state.db.topics = state.db.topics.filter(x => x.id !== id);
+          saveDB();
+          closeModal();
+          renderTopics();
+          renderHome();
+          setStatus("Topic deleted.");
+        });
+      }, 0);
+    }
+
+    if(act === "editTopic"){
+      const id = btn.dataset.id;
+      const t = state.db.topics.find(x => x.id === id);
+      if(!t) return;
+      const can = isAdmin() || (t.author?.role === "user" && currentUser() && t.author?.id === currentUser().id);
+      if(!can) return;
+
+      showModal("Edit Topic", `
+        <div class="panel">
+          <div class="h1 small">Edit Topic</div>
+          <label>Title</label>
+          <input id="editTopicTitle" type="text" maxlength="80" value="${escapeHTML(t.title)}" />
+          <label>Body</label>
+          <textarea id="editTopicBody" maxlength="6000">${escapeHTML(t.body)}</textarea>
+          <label>Replace Image (optional)</label>
+          <input id="editTopicImg" type="file" accept="image/*" />
+          <label><input type="checkbox" id="editTopicRemoveImg" /> Remove existing image</label>
+          <div class="actions">
+            <button class="btn good" id="saveTopicEdit" type="button">Save</button>
+          </div>
+        </div>
+      `);
+      setTimeout(() => {
+        let pendingImg = null;
+        $("#editTopicImg")?.addEventListener("change", async () => {
+          const f = $("#editTopicImg").files && $("#editTopicImg").files[0];
+          if(!f){ pendingImg = null; return; }
+          try{
+            pendingImg = await fileToCompressedDataURL(f);
+            setStatus("New image ready.");
+          }catch(err){
+            console.error(err);
+            pendingImg = null;
+            $("#editTopicImg").value = "";
+            setStatus(err.message || "Image failed.");
+          }
+        });
+
+        $("#saveTopicEdit")?.addEventListener("click", () => {
+          const tt = ($("#editTopicTitle").value || "").trim().slice(0,80);
+          const bb = ($("#editTopicBody").value || "").trim();
+          if(!tt || !bb){
+            setStatus("Title and body are required.");
+            return;
+          }
+          t.title = tt;
+          t.body = bb;
+          if($("#editTopicRemoveImg").checked) t.image = null;
+          if(pendingImg) t.image = pendingImg;
+          t.updatedAt = nowISO();
+          saveDB();
+          closeModal();
+          renderTopics();
+          renderHome();
+          setStatus("Topic updated.");
+        });
+      }, 0);
+    }
+
+    if(act === "addTopicComment"){
+      const id = btn.dataset.id;
+      const boxId = btn.dataset.box;
+      const txt = $("#"+boxId)?.value || "";
+      $("#"+boxId).value = "";
+      addCommentToTopic(id, txt);
+    }
+
+    // comment deletion handled by the same delegated handler in newsList.
+    if(act === "delComment"){
+      // handled by newsList listener; but topic list might contain comment delete buttons too
+      const ctx = btn.dataset.ctx;
+      const commentId = btn.dataset.id;
+      const [kind, parentId] = ctx.split(":");
+      if(kind !== "topic") return;
+      const t = state.db.topics.find(x => x.id === parentId);
+      if(!t) return;
+      t.comments = t.comments.filter(c => c.id !== commentId);
+      t.updatedAt = nowISO();
+      saveDB();
+      renderTopics();
+      renderHome();
+      setStatus("Comment deleted.");
+    }
+  });
+
+  // ====== HOME RENDER ======
+  function renderHome(){
+    const sub = $("#homeSub");
+    if(isAdmin()){
+      sub.textContent = "Logged in as Admin. You can publish news and moderate all posts.";
+    }else{
+      const u = currentUser();
+      sub.textContent = u ? `Logged in as ${u.name}. You can post topics and comments.` : "Guest mode.";
+    }
+
+    const latestNews = state.db.news.slice(0,2);
+    const latestTopics = state.db.topics.slice(0,2);
+
+    $("#homeLatestNews").innerHTML = latestNews.length ? latestNews.map(n => `
+      <div class="card">
+        <h3>${escapeHTML(n.title)}</h3>
+        <div class="meta">
+          <span class="pill">${fmtTime(n.createdAt)}</span>
+          <span class="pill">Comments: ${n.comments.length}</span>
+        </div>
+        <div class="body">${escapeHTML(n.body.slice(0,220))}${n.body.length>220 ? "..." : ""}</div>
+        <div class="actions">
+          <button class="btn link" type="button" data-jump="news">Open News</button>
+        </div>
+      </div>
+    `).join("") : `<div class="note">No news yet.</div>`;
+
+    $("#homeLatestTopics").innerHTML = latestTopics.length ? latestTopics.map(t => `
+      <div class="card">
+        <h3>${escapeHTML(t.title)}</h3>
+        <div class="meta">
+          <span class="pill">${fmtTime(t.createdAt)}</span>
+          <span class="pill">Comments: ${t.comments.length}</span>
+        </div>
+        <div class="body">${escapeHTML(t.body.slice(0,220))}${t.body.length>220 ? "..." : ""}</div>
+        <div class="actions">
+          <button class="btn link" type="button" data-jump="board">Open Board</button>
+        </div>
+      </div>
+    `).join("") : `<div class="note">No topics yet.</div>`;
+
+    // delegate jump buttons
+    $("#tab_home").addEventListener("click", (e) => {
+      const b = e.target.closest("button[data-jump]");
+      if(!b) return;
+      setActiveTab(b.dataset.jump);
+    }, { once:true });
+  }
+
+  // ====== PROFILE ======
+  async function changePassword(oldPw, newPw){
+    const u = currentUser();
+    if(!u) return false;
+    const oldHash = await pbkdf2Hash(oldPw, u.pw.salt, u.pw.iter);
+    if(oldHash !== u.pw.hash) return false;
+
+    const salt = randHex(16);
+    const iter = 120000;
+    const hash = await pbkdf2Hash(newPw, salt, iter);
+    u.pw = { salt, iter, hash };
+    saveDB();
+    return true;
+  }
+
+  function renderProfile(){
+    const box = $("#profileInfo");
+    if(isAdmin()){
+      box.textContent = "Admin session active. Admin can post news and moderate everything. (Client-side demo.)";
+      return;
+    }
+    const u = currentUser();
+    if(!u){
+      box.textContent = "Not logged in.";
+      return;
+    }
+    box.textContent =
+`Display Name: ${u.name}
+User ID: ${u.id}
+Created: ${fmtTime(u.createdAt)}
+Local topics: ${state.db.topics.filter(t => t.author?.role==="user" && t.author?.id===u.id).length}
+Local comments: (counted inside posts)`;
+  }
+
+  $("#btnChangePw").addEventListener("click", async () => {
+    if(isAdmin()){
+      setStatus("Admin password is fixed in the page source (client-side).");
+      return;
+    }
+    const oldPw = $("#pwOld").value;
+    const n1 = $("#pwNew1").value;
+    const n2 = $("#pwNew2").value;
+    if(n1.length < 4){
+      setStatus("New password too short (min 4).");
+      return;
+    }
+    if(n1 !== n2){
+      setStatus("New passwords do not match.");
+      return;
+    }
+    try{
+      const ok = await changePassword(oldPw, n1);
+      if(!ok){
+        setStatus("Wrong current password.");
+        return;
+      }
+      $("#pwOld").value = "";
+      $("#pwNew1").value = "";
+      $("#pwNew2").value = "";
+      setStatus("Password changed.");
+    }catch(err){
+      console.error(err);
+      setStatus("Password change failed.");
+    }
+  });
+
+  $("#btnDeleteMe").addEventListener("click", () => {
+    if(isAdmin()){
+      setStatus("Admin session cannot be deleted.");
+      return;
+    }
+    const u = currentUser();
+    if(!u){
+      setStatus("Not logged in.");
+      return;
+    }
+    showModal("Delete Account", `
+      <div class="note warn">
+        Delete your local account "${escapeHTML(u.name)}" and all locally-authored references?
+        Your topics will remain but will show the old name (snapshot). This is a local demo.
+      </div>
+      <label>Type your name to confirm</label>
+      <input id="delNameConfirm" type="text" />
+      <div class="actions">
+        <button class="btn danger" id="confirmDeleteMe" type="button">Delete My Account</button>
+      </div>
+    `);
+    setTimeout(() => {
+      $("#confirmDeleteMe")?.addEventListener("click", () => {
+        const typed = cleanName($("#delNameConfirm").value);
+        if(typed !== u.name){
+          setStatus("Name does not match.");
+          return;
+        }
+        state.db.users = state.db.users.filter(x => x.id !== u.id);
+        saveDB();
+        clearSession();
+        closeModal();
+        ensureLoginOptions();
+        showOnly("login");
+        setStatus("Account deleted (locally).");
+        setRoleBadge();
+      });
+    }, 0);
+  });
+
+  // ====== HOME/NEWS/BOARD QUICK LINKS ======
+  function showWizardOrLogin(){
+    if(!state.db.onboarding.completed){
+      showOnly("wizard");
+      showWizardStep(1);
+    }else{
+      ensureLoginOptions();
+      showOnly("login");
+    }
+  }
+
+  // ====== INITIALIZE ======
+  $("#btnLogout").disabled = !state.session;
+  showWizardOrLogin();
+  route();
+
+  // ====== KEYBOARD QUALITY-OF-LIFE ======
+  document.addEventListener("keydown", (e) => {
+    if(e.key === "Escape"){
+      if(!$("#modal").classList.contains("hidden")) closeModal();
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
 
